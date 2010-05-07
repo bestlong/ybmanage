@@ -1,0 +1,31 @@
+object fBgFormBase: TfBgFormBase
+  Left = 386
+  Top = 261
+  AlphaBlendValue = 238
+  BorderStyle = bsNone
+  ClientHeight = 143
+  ClientWidth = 252
+  Color = clWhite
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = #23435#20307
+  Font.Style = []
+  FormStyle = fsStayOnTop
+  KeyPreview = True
+  OldCreateOrder = False
+  Position = poOwnerFormCenter
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  PixelsPerInch = 96
+  TextHeight = 12
+  object ClientPanel1: TZnTransPanel
+    Left = 0
+    Top = 0
+    Width = 252
+    Height = 143
+    Align = alClient
+    Ctl3D = False
+  end
+end
