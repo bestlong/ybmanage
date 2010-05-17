@@ -2,7 +2,7 @@
   作者: dmzn@163.com 2009-6-13
   描述: 数据还原窗口
 *******************************************************************************}
-unit UFormRestore;
+unit UFormRestoreSQL;
 
 interface
 
@@ -12,7 +12,7 @@ uses
   cxEdit, cxTextEdit, cxMCListBox, Menus, UFormBase;
 
 type
-  TfFormRestore = class(TBaseForm)
+  TfFormRestoreSQL = class(TBaseForm)
     dxLayout1Group_Root: TdxLayoutGroup;
     dxLayout1: TdxLayoutControl;
     dxLayout1Group1: TdxLayoutGroup;
@@ -60,15 +60,15 @@ uses
 
 //------------------------------------------------------------------------------
 //Desc: 数据还原窗体
-class function TfFormRestore.CreateForm;
+class function TfFormRestoreSQL.CreateForm;
 begin
   Result := nil;
   if gSysDBType = dtAccess then
   begin
-    ShowMsg('单机模式不支持数据还原', sHint); Exit;
+    ShowMsg('该功能支持SQLServer数据库', sHint); Exit;
   end;
 
-  with TfFormRestore.Create(Application) do
+  with TfFormRestoreSQL.Create(Application) do
   begin
     Caption := '数据还原';
     ShowModal;
@@ -76,24 +76,24 @@ begin
   end;
 end;
 
-class function TfFormRestore.FormID: integer;
+class function TfFormRestoreSQL.FormID: integer;
 begin
   Result := cFI_FormRestore;
 end;
 
-procedure TfFormRestore.FormCreate(Sender: TObject);
+procedure TfFormRestoreSQL.FormCreate(Sender: TObject);
 begin
   LoadBackList;
 end;
 
-procedure TfFormRestore.BtnExitClick(Sender: TObject);
+procedure TfFormRestoreSQL.BtnExitClick(Sender: TObject);
 begin
   Close;
 end;
 
 //------------------------------------------------------------------------------  .
 //Desc: 载入备份列表
-procedure TfFormRestore.LoadBackList;
+procedure TfFormRestoreSQL.LoadBackList;
 var nStr: string;
     nIni: TIniFile;
     nList: TStrings;
@@ -111,6 +111,9 @@ begin
     nCount := nList.Count - 1;
     for i:=0 to nCount do
     begin
+      if Pos(cSysDatabaseName[Ord(dtSQLServer)], nList[i]) < 1 then Continue;
+      //非SQL Sever备份
+
       nStr := nIni.ReadString(nList[i], 'BackName', '');
       if nStr = '' then Continue;
 
@@ -128,13 +131,13 @@ begin
 end;
 
 //Desc: 刷新
-procedure TfFormRestore.N1Click(Sender: TObject);
+procedure TfFormRestoreSQL.N1Click(Sender: TObject);
 begin
   LoadBackList;
 end;
 
 //Desc: 删除备份
-procedure TfFormRestore.N2Click(Sender: TObject);
+procedure TfFormRestoreSQL.N2Click(Sender: TObject);
 var nStr: string;
     nIni: TIniFile;
     nList: TStrings;
@@ -173,7 +176,7 @@ begin
 end;
 
 //Desc: 显示备份细节
-procedure TfFormRestore.BackList1Click(Sender: TObject);
+procedure TfFormRestoreSQL.BackList1Click(Sender: TObject);
 var nStr: string;
     nList: TStrings;
 begin
@@ -193,7 +196,7 @@ begin
 end;
 
 //Desc: 开始备份
-procedure TfFormRestore.BtnOKClick(Sender: TObject);
+procedure TfFormRestoreSQL.BtnOKClick(Sender: TObject);
 var nStr: string;
     nList: TStrings;
 begin
@@ -243,5 +246,5 @@ begin
 end;
 
 initialization
-  gControlManager.RegCtrl(TfFormRestore, TfFormRestore.FormID);
+  gControlManager.RegCtrl(TfFormRestoreSQL, TfFormRestoreSQL.FormID);
 end.

@@ -1,6 +1,6 @@
 object BaseForm: TBaseForm
-  Left = 420
-  Top = 264
+  Left = 296
+  Top = 250
   Width = 345
   Height = 334
   Color = clBtnFace
@@ -9,6 +9,7 @@ object BaseForm: TBaseForm
   Font.Height = -12
   Font.Name = #23435#20307
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 12

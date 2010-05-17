@@ -1,4 +1,4 @@
-inherited fFormBackup: TfFormBackup
+inherited fFormBackupSQL: TfFormBackupSQL
   Left = 391
   Top = 219
   BorderIcons = [biSystemMenu, biMinimize]
@@ -18,6 +18,7 @@ inherited fFormBackup: TfFormBackup
     Height = 282
     Align = alClient
     TabOrder = 0
+    TabStop = False
     LookAndFeel = FDM.dxLayoutWeb1
     object EditLastName: TcxTextEdit
       Left = 81

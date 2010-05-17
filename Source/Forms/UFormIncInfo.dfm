@@ -3,8 +3,8 @@ inherited fFormIncInfo: TfFormIncInfo
   Top = 173
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
-  ClientHeight = 270
-  ClientWidth = 373
+  ClientHeight = 249
+  ClientWidth = 358
   OldCreateOrder = True
   Position = poMainFormCenter
   PixelsPerInch = 96
@@ -12,11 +12,12 @@ inherited fFormIncInfo: TfFormIncInfo
   object dxLayoutControl1: TdxLayoutControl
     Left = 0
     Top = 0
-    Width = 373
-    Height = 270
+    Width = 358
+    Height = 249
     Align = alClient
     TabOrder = 0
     TabStop = False
+    AutoContentSizes = [acsWidth]
     LookAndFeel = FDM.dxLayoutWeb1
     object EditName: TcxTextEdit
       Left = 81
@@ -56,15 +57,16 @@ inherited fFormIncInfo: TfFormIncInfo
     object EditMemo: TcxMemo
       Left = 81
       Top = 161
+      Align = alClient
       ParentFont = False
       Properties.ScrollBars = ssVertical
       TabOrder = 5
-      Height = 64
-      Width = 266
+      Height = 40
+      Width = 252
     end
     object BtnExit: TButton
-      Left = 284
-      Top = 237
+      Left = 272
+      Top = 213
       Width = 75
       Height = 22
       Caption = #21462#28040
@@ -72,8 +74,8 @@ inherited fFormIncInfo: TfFormIncInfo
       TabOrder = 7
     end
     object BtnOK: TButton
-      Left = 204
-      Top = 237
+      Left = 192
+      Top = 213
       Width = 75
       Height = 22
       Caption = #30830#23450
@@ -85,8 +87,6 @@ inherited fFormIncInfo: TfFormIncInfo
       Hidden = True
       ShowBorder = False
       object dxLayoutControl1Group1: TdxLayoutGroup
-        AutoAligns = [aaVertical]
-        AlignHorz = ahClient
         Caption = #20844#21496#20449#24687
         object dxLayoutControl1Item1: TdxLayoutItem
           Caption = #20844#21496#21517#31216':'
@@ -120,6 +120,8 @@ inherited fFormIncInfo: TfFormIncInfo
         end
       end
       object dxLayoutControl1Group2: TdxLayoutGroup
+        AutoAligns = [aaVertical]
+        AlignHorz = ahRight
         ShowCaption = False
         Hidden = True
         LayoutDirection = ldHorizontal

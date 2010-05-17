@@ -2,7 +2,7 @@
   作者: dmzn@163.com 2009-6-13
   描述: 数据备份窗口
 *******************************************************************************}
-unit UFormBackup;
+unit UFormBackupSQL;
 
 interface
 
@@ -12,7 +12,7 @@ uses
   cxEdit, cxTextEdit, UFormBase;
 
 type
-  TfFormBackup = class(TBaseForm)
+  TfFormBackupSQL = class(TBaseForm)
     dxLayout1Group_Root: TdxLayoutGroup;
     dxLayout1: TdxLayoutControl;
     dxLayout1Group1: TdxLayoutGroup;
@@ -54,15 +54,15 @@ uses
 
 //------------------------------------------------------------------------------
 //Desc: 数据备份窗体
-class function TfFormBackup.CreateForm;
+class function TfFormBackupSQL.CreateForm;
 begin
   Result := nil;
-  if gSysDBType = dtAccess then
+  if gSysDBType <> dtSQLServer then
   begin
-    ShowMsg('单机模式不支持数据备份', sHint); Exit;
+    ShowMsg('该功能支持SQLServer数据库', sHint); Exit;
   end;
 
-  with TfFormBackup.Create(Application) do
+  with TfFormBackupSQL.Create(Application) do
   begin
     Caption := '数据备份';
     ShowModal;
@@ -70,12 +70,12 @@ begin
   end;
 end;
 
-class function TfFormBackup.FormID: integer;
+class function TfFormBackupSQL.FormID: integer;
 begin
   Result := cFI_FormBackup;
 end;
 
-procedure TfFormBackup.FormCreate(Sender: TObject);
+procedure TfFormBackupSQL.FormCreate(Sender: TObject);
 var nStr: string;
     nIni: TIniFile;
 begin
@@ -92,7 +92,7 @@ begin
   end;
 end;
 
-procedure TfFormBackup.BtnExitClick(Sender: TObject);
+procedure TfFormBackupSQL.BtnExitClick(Sender: TObject);
 begin
   Close;
 end;
@@ -117,7 +117,7 @@ begin
 end;
 
 //Desc: 开始备份
-procedure TfFormBackup.BtnOKClick(Sender: TObject);
+procedure TfFormBackupSQL.BtnOKClick(Sender: TObject);
 var nIni: TIniFile;
     nList: TStrings;
     nStr,nFile: string;
@@ -149,7 +149,7 @@ begin
     nIni.WriteString('Setup', 'LastName', EditName.Text);
     nIni.WriteString('Setup', 'LastTime', EditTime.Text);
 
-    nStr := FloatToStr(Now);
+    nStr := cSysDatabaseName[Ord(dtSQLServer)] + '_' + FloatToStr(Now);
     nIni.WriteString(nStr, 'BackName', EditName.Text);
     nIni.WriteString(nStr, 'BackTime', EditTime.Text);
     nIni.WriteString(nStr, 'BackMemo', FixedEnterKey(EditMemo.Text));
@@ -168,5 +168,5 @@ begin
 end;
 
 initialization
-  gControlManager.RegCtrl(TfFormBackup, TfFormBackup.FormID);
+  gControlManager.RegCtrl(TfFormBackupSQL, TfFormBackupSQL.FormID);
 end.

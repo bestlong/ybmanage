@@ -177,7 +177,7 @@ var nStr: string;
 begin
   if not gSysParam.FIsAdmin then
   begin
-    nStr := gPopedomManager.FindUserPopedom(gSysParam.FUserID, FPopedom);
+    nStr := gPopedomManager.FindUserPopedom(gSysParam.FUserID, PopedomItem);
     BtnAdd.Enabled := Pos(sPopedom_Add, nStr) > 0;
     BtnDel.Enabled := Pos(sPopedom_Delete, nStr) > 0;
   end;
