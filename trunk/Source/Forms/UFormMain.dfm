@@ -1,6 +1,6 @@
 object fMainForm: TfMainForm
-  Left = 278
-  Top = 255
+  Left = 272
+  Top = 226
   Width = 602
   Height = 428
   Color = clWhite
@@ -27,7 +27,7 @@ object fMainForm: TfMainForm
     TabOrder = 0
     object HintLabel: TLabel
       Left = 8
-      Top = 40
+      Top = 26
       Width = 90
       Height = 20
       Caption = 'HintLabel'
@@ -42,7 +42,7 @@ object fMainForm: TfMainForm
   end
   object sBar: TStatusBar
     Left = 0
-    Top = 362
+    Top = 354
     Width = 594
     Height = 20
     Panels = <
@@ -59,36 +59,11 @@ object fMainForm: TfMainForm
         Width = 50
       end>
   end
-  object WorkPanel: TPanel
-    Left = 195
-    Top = 80
-    Width = 399
-    Height = 282
-    Align = alClient
-    BevelOuter = bvNone
-    Color = clWhite
-    TabOrder = 2
-    object PaintBg1: TPaintBox
-      Left = 0
-      Top = 0
-      Width = 399
-      Height = 282
-      Align = alClient
-      OnPaint = PaintBg1Paint
-    end
-    object ImageBg1: TImage
-      Left = 6
-      Top = 6
-      Width = 105
-      Height = 105
-      Visible = False
-    end
-  end
   object Splitter1: TcxSplitter
     Left = 187
     Top = 80
     Width = 8
-    Height = 282
+    Height = 274
     HotZoneClassName = 'TcxXPTaskBarStyle'
     Control = NavBar1
   end
@@ -96,7 +71,7 @@ object fMainForm: TfMainForm
     Left = 0
     Top = 80
     Width = 187
-    Height = 282
+    Height = 274
     Align = alLeft
     ActiveGroupIndex = 0
     DragCopyCursor = -1119
@@ -132,6 +107,33 @@ object fMainForm: TfMainForm
       UseSmallImages = False
       Visible = True
       Links = <>
+    end
+  end
+  object wTab: TcxTabControl
+    Left = 195
+    Top = 80
+    Width = 399
+    Height = 274
+    Align = alClient
+    Options = [pcoAlwaysShowGoDialogButton, pcoGoDialog, pcoGradient, pcoGradientClientArea, pcoRedrawOnResize]
+    ShowFrame = True
+    Style = 9
+    TabIndex = 0
+    TabOrder = 4
+    Tabs.Strings = (
+      'test')
+    TabSlants.Kind = skCutCorner
+    OnChange = wTabChange
+    ClientRectBottom = 273
+    ClientRectLeft = 1
+    ClientRectRight = 398
+    ClientRectTop = 19
+    object WorkPanel: TZnBitmapPanel
+      Left = 1
+      Top = 19
+      Width = 397
+      Height = 254
+      Align = alClient
     end
   end
   object MainMenu1: TMainMenu

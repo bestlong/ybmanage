@@ -169,8 +169,7 @@ begin
       LoadConnecteDBConfig(nList);
 
       if nList.Values[sConn_Key_DBName] = 'µ¥»ú' then
-           gSysDBType := dtAccess
-      else gSysDBType := dtSQLServer;
+        gSysDBType := dtAccess;
       nList.Free;
     except
       if Assigned(nList) then nList.Free;

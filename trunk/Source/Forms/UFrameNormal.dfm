@@ -6,19 +6,19 @@ inherited fFrameNormal: TfFrameNormal
     Left = 0
     Top = 22
     Width = 602
-    Height = 39
-    AutoSize = True
+    Height = 37
     ButtonHeight = 35
     ButtonWidth = 67
-    EdgeBorders = [ebLeft, ebTop, ebRight, ebBottom]
+    EdgeBorders = []
     Flat = True
     Images = FDM.ImageBar
     ShowCaptions = True
     TabOrder = 0
+    OnAdvancedCustomDraw = ToolBar1AdvancedCustomDraw
     object BtnAdd: TToolButton
       Left = 0
       Top = 0
-      Caption = '   '#28155#21152'   '
+      Caption = #28155#21152
       ImageIndex = 0
     end
     object BtnEdit: TToolButton
@@ -88,16 +88,18 @@ inherited fFrameNormal: TfFrameNormal
     object BtnExit: TToolButton
       Left = 493
       Top = 0
-      Caption = #20851#38381
+      Caption = '   '#20851#38381'   '
       ImageIndex = 7
+      OnClick = BtnExitClick
     end
   end
   object cxGrid1: TcxGrid
     Left = 0
-    Top = 161
+    Top = 167
     Width = 602
-    Height = 206
+    Height = 200
     Align = alClient
+    BorderStyle = cxcbsNone
     TabOrder = 1
     object cxView1: TcxGridDBTableView
       NavigatorButtons.ConfirmDelete = False
@@ -113,14 +115,15 @@ inherited fFrameNormal: TfFrameNormal
   end
   object dxLayout1: TdxLayoutControl
     Left = 0
-    Top = 61
+    Top = 59
     Width = 602
     Height = 100
     Align = alTop
     BevelEdges = [beLeft, beRight, beBottom]
-    BevelKind = bkTile
     TabOrder = 2
+    TabStop = False
     AutoContentSizes = [acsWidth]
+    AutoControlAlignment = False
     LookAndFeel = FDM.dxLayoutWeb1
     object dxGroup1: TdxLayoutGroup
       ShowCaption = False
@@ -136,19 +139,48 @@ inherited fFrameNormal: TfFrameNormal
       end
     end
   end
-  object TitleBar: TcxLabel
+  object cxSplitter1: TcxSplitter
+    Left = 0
+    Top = 159
+    Width = 602
+    Height = 8
+    HotZoneClassName = 'TcxXPTaskBarStyle'
+    AlignSplitter = salTop
+    Control = dxLayout1
+  end
+  object TitlePanel1: TZnBitmapPanel
     Left = 0
     Top = 0
-    Align = alTop
-    AutoSize = False
-    Caption = 'title'
-    ParentFont = False
-    Properties.Alignment.Horz = taCenter
-    Properties.Alignment.Vert = taVCenter
-    Properties.LabelStyle = cxlsLowered
-    Style.TextColor = clBlack
-    Height = 22
     Width = 602
+    Height = 22
+    Align = alTop
+    object TitleBar: TcxLabel
+      Left = 0
+      Top = 0
+      Align = alClient
+      AutoSize = False
+      Caption = 'title'
+      ParentFont = False
+      Style.BorderStyle = ebsNone
+      Style.Edges = [bBottom]
+      Style.Font.Charset = GB2312_CHARSET
+      Style.Font.Color = clBlack
+      Style.Font.Height = -12
+      Style.Font.Name = #23435#20307
+      Style.Font.Style = []
+      Style.TextColor = clGray
+      Style.IsFontAssigned = True
+      Properties.Alignment.Horz = taCenter
+      Properties.Alignment.Vert = taVCenter
+      Properties.LabelEffect = cxleExtrude
+      Properties.LabelStyle = cxlsLowered
+      Properties.ShadowedColor = clBlack
+      Transparent = True
+      Height = 22
+      Width = 602
+      AnchorX = 301
+      AnchorY = 11
+    end
   end
   object SQLQuery: TADOQuery
     Connection = FDM.ADOConn

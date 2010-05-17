@@ -1,4 +1,4 @@
-inherited fFormRestore: TfFormRestore
+inherited fFormRestoreSQL: TfFormRestoreSQL
   Left = 286
   Top = 161
   BorderIcons = [biSystemMenu, biMinimize]

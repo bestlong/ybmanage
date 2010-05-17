@@ -9,16 +9,15 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  UMgrMenu, UTrayIcon, UDataModule, ExtCtrls, Menus, cxClasses,
-  dxNavBarBase, dxNavBarCollns, dxNavBar, cxControls, cxSplitter, ComCtrls,
-  StdCtrls;
+  UMgrMenu, UTrayIcon, UDataModule, USysFun, ExtCtrls, Menus, UBitmapPanel,
+  cxPC, cxClasses, dxNavBarBase, dxNavBarCollns, dxNavBar, cxControls,
+  cxSplitter, ComCtrls, StdCtrls;
 
 type
   TfMainForm = class(TForm)
     MainMenu1: TMainMenu;
     HintPanel: TPanel;
     sBar: TStatusBar;
-    WorkPanel: TPanel;
     HintLabel: TLabel;
     Timer1: TTimer;
     N1: TMenuItem;
@@ -26,13 +25,13 @@ type
     NavBar1: TdxNavBar;
     BarGroup1: TdxNavBarGroup;
     BarGroup2: TdxNavBarGroup;
-    PaintBg1: TPaintBox;
-    ImageBg1: TImage;
+    wTab: TcxTabControl;
+    WorkPanel: TZnBitmapPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure Timer1Timer(Sender: TObject);
     procedure Image1DblClick(Sender: TObject);
-    procedure PaintBg1Paint(Sender: TObject);
+    procedure wTabChange(Sender: TObject);
   private
     { Private declarations }
     FTrayIcon: TTrayIcon;
@@ -51,6 +50,10 @@ type
     procedure AddNavBarItem(nGroup: TdxNavBarGroup; nMenu: PMenuItemData);
     procedure AddNavBarItems(nGroup: TdxNavBarGroup; const nMenu: string);
     {*导航信息*}
+    procedure WMFrameChange(var nMsg: TMessage); message WM_FrameChange;
+    procedure DoFrameChange(const nName: string; const nCtrl: TWinControl;
+      const nState: TControlChangeState);
+    {*组件变动*}
   public
     { Public declarations }
   end;
@@ -63,9 +66,9 @@ implementation
 {$R *.dfm}
 
 uses
-  ShellAPI, IniFiles, UcxChinese, ULibFun, UMgrControl, UMgrLog, 
-  UMgrIni, USysFun, USysObject, USysDB, USysConst, USysModule, USysMenu,
-  USysPopedom, UFormWait, UFormLogin, UFrameBase, UFormBase, UImageControl;
+  ShellAPI, IniFiles, UcxChinese, ULibFun, UMgrControl, UMgrLog,
+  UMgrIni, USysDB, USysConst, USysObject, USysModule, USysMenu, USysPopedom,
+  UFormWait, UFormLogin, UFrameBase, UFrameNormal, UFormBase, UImageControl;
 
 //------------------------------------------------------------------------------
 procedure WriteLog(const nEvent: string);
@@ -91,7 +94,7 @@ begin
 
   nLabel.Caption := gSysParam.FHintText;
   nLabel.Left := 8;
-  nLabel.Top := Round(HintPanel.Height - nLabel.Height) div 2;
+  //nLabel.Top := (HintPanel.Height + nLabel.Height - 12) div 2;
 end;
 
 //Desc: 载入窗体配置
@@ -99,6 +102,9 @@ procedure TfMainForm.FormLoadConfig;
 var nStr: string;
     nIni: TIniFile;
 begin
+  HintPanel.DoubleBuffered := True;
+  WorkPanel.DoubleBuffered := True;
+
   gStatusBar := sBar;
   nStr := Format(sDate, [DateToStr(Now)]);
   StatusBarMsg(nStr, cSBar_Date);
@@ -110,21 +116,6 @@ begin
   StatusBarMsg(nStr, cSBar_User);
 
   SetHintText(HintLabel);
-  HintPanel.DoubleBuffered := True;
-  WorkPanel.DoubleBuffered := True;
-
-  nIni := TIniFile.Create(gPath + sFormConfig);
-  try
-    LoadFormConfig(Self, nIni);
-    nStr := nIni.ReadString(Name, 'NavBar', '');
-    if IsNumber(nStr, False) then NavBar1.Width := StrToInt(nStr);
-
-    nStr := nIni.ReadString(Name, 'BgImage', gPath + 'BgImage.bmp');
-    if FileExists(nStr) then ImageBg1.Picture.LoadFromFile(nStr);
-  finally
-    nIni.Free;
-  end;
-
   with TImageControl.Create(Self) do
   begin
     Parent := HintPanel;
@@ -132,6 +123,23 @@ begin
     Position := cpTop;
   end;
   HintLabel.BringToFront;
+
+  SetFrameChangeEvent(DoFrameChange);
+  wTab.Tabs.Clear;
+  PostMessage(Handle, WM_FrameChange, 0, 0);
+  
+  nIni := TIniFile.Create(gPath + sFormConfig);
+  try
+    LoadFormConfig(Self, nIni);
+    nStr := nIni.ReadString(Name, 'NavBar', '');
+    if IsNumber(nStr, False) then NavBar1.Width := StrToInt(nStr);
+
+    nStr := nIni.ReadString(Name, 'BgImage', gPath + sImageDir + 'bg.bmp');
+    nStr := ReplaceGlobalPath(nStr);
+    if FileExists(nStr) then WorkPanel.LoadBitmap(nStr);
+  finally
+    nIni.Free;
+  end;
 end;
 
 //Desc: 保存窗体配置
@@ -232,28 +240,6 @@ procedure TfMainForm.Timer1Timer(Sender: TObject);
 begin
   sBar.Panels[cSBar_Date].Text := Format(sDate, [DateToStr(Now)]);
   sBar.Panels[cSBar_Time].Text := Format(sTime, [TimeToStr(Now)]);
-end;
-
-//Desc: 平铺绘制背景
-procedure TfMainForm.PaintBg1Paint(Sender: TObject);
-var nX,nY: integer;
-begin
-  if Assigned(ImageBg1.Picture.Graphic) then
-  begin
-    nX := 0;
-    while nX < WorkPanel.Width do
-    begin
-      nY := 0;
-
-      while nY < WorkPanel.Height do
-      begin
-        PaintBg1.Canvas.Draw(nX, nY, ImageBg1.Picture.Graphic);
-        Inc(nY, ImageBg1.Picture.Graphic.Height);
-      end;
-
-      Inc(nX, ImageBg1.Picture.Graphic.Width);
-    end;
-  end;
 end;
 
 //Date: 2009-5-26
@@ -523,6 +509,61 @@ begin
          CreateBaseFormItem(nP.FModule, nFull)
     else CreateBaseFrameItem(nP.FModule, WorkPanel, nFull);
   end else DoFixedMenuActive(nFull);
+end;
+
+//------------------------------------------------------------------------------
+//Desc: 增减Frame
+procedure TfMainForm.DoFrameChange(const nName: string;
+  const nCtrl: TWinControl; const nState: TControlChangeState);
+var nIdx: Integer;
+begin
+  if csDestroying in ComponentState then Exit;
+  //主窗口退出时不处理
+
+  if nState = fsNew then
+    wTab.Tabs.AddObject(nName, nCtrl);
+  //xxxxx
+
+  if nState = fsFree then
+  begin
+    for nIdx:=wTab.Tabs.Count - 1 downto 0 do
+     if wTab.Tabs.Objects[nIdx] = nCtrl then wTab.Tabs.Delete(nIdx);
+  end;
+
+  PostMessage(Handle, WM_FrameChange, 0, 0);
+end;
+
+//Desc: 同步活动的Frame和Tab
+procedure TfMainForm.WMFrameChange(var nMsg: TMessage);
+var nIdx: Integer;
+    nCtrl: TControl;
+begin
+  if WorkPanel.ControlCount > 0 then
+  begin
+    wTab.HideTabs := False;
+    wTab.ShowFrame := True;
+    nCtrl := WorkPanel.Controls[WorkPanel.ControlCount - 1];
+
+    for nIdx:=wTab.Tabs.Count - 1 downto 0 do
+     if wTab.Tabs.Objects[nIdx] = nCtrl then wTab.TabIndex := nIdx;
+  end else
+  begin
+    wTab.HideTabs := True;
+    wTab.ShowFrame := False;
+  end;
+end;
+
+//Desc: 同步活动Tab和Frame
+procedure TfMainForm.wTabChange(Sender: TObject);
+begin
+  if wTab.Tabs.Count > 0 then
+  try
+    if wTab.Tabs.Objects[wTab.TabIndex] is TWinControl then
+      TWinControl(wTab.Tabs.Objects[wTab.TabIndex]).BringToFront;
+    //xxxxx
+  except
+    //ignor any error
+  end;
 end;
 
 end.

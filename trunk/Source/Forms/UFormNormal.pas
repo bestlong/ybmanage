@@ -8,7 +8,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  UDataModule, UFormBase, dxLayoutControl, cxControls, StdCtrls;
+  UDataModule, UFormBase, ULibFun, UAdjustForm, USysConst, dxLayoutControl,
+  StdCtrls, cxControls;
 
 type
   TfFormNormal = class(TBaseForm)
@@ -20,8 +21,6 @@ type
     BtnExit: TButton;
     dxLayout1Item2: TdxLayoutItem;
     dxLayout1Group1: TdxLayoutGroup;
-    procedure FormKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
     procedure BtnExitClick(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
   protected
@@ -31,45 +30,13 @@ type
     {*验证数据*}
     procedure GetSaveSQLList(const nList: TStrings); virtual;
     {*写SQL列表*}
-  published
-    procedure OnCtrlKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState); virtual;
-    {*按键处理*}
+    procedure AfterSaveData(var nDefault: Boolean); virtual;
+    {*后续动作*}
   end;
 
 implementation
 
 {$R *.dfm}
-uses
-  ULibFun, UAdjustForm, USysConst;
-
-procedure TfFormNormal.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-begin
-  if Key = VK_ESCAPE then
-  begin
-    Key := 0; Close;
-  end;
-end;
-
-//Desc: 处理快捷键
-procedure TfFormNormal.OnCtrlKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-begin
-  if ssCtrl in Shift then
-  begin
-    case Key of
-     VK_DOWN:
-      begin
-        Key := 0; SwitchFocusCtrl(Self, True);
-      end;
-     VK_UP:
-      begin
-        Key := 0; SwitchFocusCtrl(Self, False);
-      end;
-    end;
-  end;
-end;
 
 procedure TfFormNormal.BtnExitClick(Sender: TObject);
 begin
@@ -111,7 +78,10 @@ begin
       begin
         if nObj is TWinControl then
           TWinControl(nObj).SetFocus;
-        ShowMsg(nStr, sHint);
+        //xxxxx
+        
+        if nStr <> '' then
+          ShowMsg(nStr, sHint);
         Result := False; Exit;
       end;
     end;
@@ -120,9 +90,16 @@ begin
   end;
 end;
 
+//Desc: 保存后续动作
+procedure TfFormNormal.AfterSaveData(var nDefault: Boolean);
+begin
+
+end;
+
 //Desc: 保存
 procedure TfFormNormal.BtnOKClick(Sender: TObject);
-var nSQLs: TStrings;
+var nBool: Boolean;
+    nSQLs: TStrings;
     i,nCount: integer;
 begin
   if not IsDataValid then Exit;
@@ -142,13 +119,19 @@ begin
       FDM.ADOConn.CommitTrans;
     end;
 
-    ModalResult := mrOK;
-    nSQLs.Free;
-    ShowMsg('已保存成功', sHint);
+    FreeAndNil(nSQLs);
+    nBool := True;
+    AfterSaveData(nBool);
+
+    if nBool then
+    begin
+      ModalResult := mrOK;
+      ShowMsg('已保存成功', sHint);
+    end;
   except
     if Assigned(nSQLs) then nSQLs.Free;
     if FDM.ADOConn.InTransaction then FDM.ADOConn.RollbackTrans;
-    ShowMsg('保存数据失败', '未知错误');
+    ShowMsg('保存数据失败', sError);
   end;
 end;
 

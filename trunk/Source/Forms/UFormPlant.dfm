@@ -2,26 +2,28 @@ inherited fFormPlant: TfFormPlant
   Left = 359
   Top = 141
   ClientHeight = 426
-  ClientWidth = 452
+  ClientWidth = 434
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 452
+    Width = 434
     Height = 426
+    AutoContentSizes = [acsWidth]
+    AutoControlAlignment = False
     inherited BtnOK: TButton
-      Left = 303
+      Left = 288
       Top = 390
       TabOrder = 11
     end
     inherited BtnExit: TButton
-      Left = 373
+      Left = 358
       Top = 390
       TabOrder = 12
     end
     object EditMemo: TcxMemo [2]
-      Left = 81
+      Left = 57
       Top = 136
       Hint = 'T.P_Memo'
       ParentFont = False
@@ -44,7 +46,7 @@ inherited fFormPlant: TfFormPlant
       Width = 90
     end
     object BtnAdd: TButton [4]
-      Left = 321
+      Left = 306
       Top = 218
       Width = 50
       Height = 20
@@ -53,7 +55,7 @@ inherited fFormPlant: TfFormPlant
       OnClick = BtnAddClick
     end
     object BtnDel: TButton [5]
-      Left = 376
+      Left = 361
       Top = 218
       Width = 50
       Height = 20
@@ -83,7 +85,7 @@ inherited fFormPlant: TfFormPlant
       OnKeyDown = OnCtrlKeyDown
     end
     object EditAddr: TcxTextEdit [7]
-      Left = 81
+      Left = 57
       Top = 86
       Hint = 'T.P_Addr'
       ParentFont = False
@@ -92,7 +94,7 @@ inherited fFormPlant: TfFormPlant
       Width = 260
     end
     object ImagePic: TcxImage [8]
-      Left = 346
+      Left = 331
       Top = 36
       Style.Edges = [bLeft, bTop, bRight, bBottom]
       TabOrder = 4
@@ -102,7 +104,7 @@ inherited fFormPlant: TfFormPlant
       Width = 80
     end
     object cxTextEdit2: TcxTextEdit [9]
-      Left = 81
+      Left = 57
       Top = 111
       Hint = 'T.P_Phone'
       ParentFont = False
@@ -112,7 +114,7 @@ inherited fFormPlant: TfFormPlant
       Width = 260
     end
     object EditID: TcxButtonEdit [10]
-      Left = 81
+      Left = 57
       Top = 36
       Hint = 'T.P_ID'
       HelpType = htKeyword
@@ -130,7 +132,7 @@ inherited fFormPlant: TfFormPlant
       Width = 260
     end
     object EditName: TcxTextEdit [11]
-      Left = 81
+      Left = 57
       Top = 61
       Hint = 'T.P_Name'
       ParentFont = False
@@ -142,6 +144,7 @@ inherited fFormPlant: TfFormPlant
     object EditInfo: TcxMemo [12]
       Left = 81
       Top = 243
+      ParentFont = False
       Properties.MaxLength = 500
       Properties.ScrollBars = ssVertical
       TabOrder = 9

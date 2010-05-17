@@ -2,21 +2,22 @@ inherited fFormPlan: TfFormPlan
   Left = 296
   Top = 137
   ClientHeight = 448
-  ClientWidth = 491
+  ClientWidth = 482
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 491
+    Width = 482
     Height = 448
+    AutoContentSizes = [acsWidth]
     inherited BtnOK: TButton
-      Left = 341
+      Left = 336
       Top = 410
       TabOrder = 8
     end
     inherited BtnExit: TButton
-      Left = 411
+      Left = 406
       Top = 410
       TabOrder = 9
     end

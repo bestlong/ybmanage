@@ -7,7 +7,8 @@ unit UFormBase;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
+  Forms, cxButtonEdit, UMgrControl, ULibFun, StdCtrls;
 
 type
   TBaseFormClass = class of TBaseForm;
@@ -24,19 +25,39 @@ type
   end;
 
   TBaseForm = class(TForm)
-  protected
+  private
+    { Private declarations }
     FPopedom: string;
+    {*权限项*}
+    FAutoFocusCtrl: Boolean;
+    {*自动焦点*}
+  protected
+    { Protected declarations }
     procedure SetPopedom(const nItem: string);
     procedure OnLoadPopedom; virtual;
+    {*权限相关*}
   public
+    { Public declarations }
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    {*创建释放*}
     class function DealCommand(Sender: TObject;
       const nCmd: integer): integer; virtual;
     class function CreateForm(const nPopedom: string = '';
       const nParam: Pointer = nil): TWinControl; virtual;
     class function FormID: integer; virtual; abstract;
     {*标识*}
-    property PopedomItem: string read FPopedom write SetPopedom;
-    {*属性*}
+    property AutoFocusCtrl: Boolean read FAutoFocusCtrl write FAutoFocusCtrl;
+    property PopedomItem: string read FPopedom write SetPopedom; 
+    {*属性相关*}
+  published
+    { Published declarations }
+    procedure OnFormKeyDown(Sender: TObject; var Key: Word;
+     Shift: TShiftState); virtual;
+    procedure OnCtrlKeyDown(Sender: TObject; var Key: Word;
+     Shift: TShiftState); virtual;
+    procedure OnCtrlKeyPress(Sender: TObject; var Key: Char);
+    {*按键处理*}
   end;
 
 function CreateBaseFormItem(const nFormID: Integer; const nPopedom: string = '';
@@ -47,8 +68,6 @@ function BroadcastFormCommand(Sender: TObject; const nCmd:integer): integer;
 implementation
 
 {$R *.dfm}
-
-uses UMgrControl;
 
 //------------------------------------------------------------------------------
 //Desc: 将命令广播给所有的BaseForm类
@@ -93,6 +112,60 @@ begin
 end;
 
 //------------------------------------------------------------------------------
+constructor TBaseForm.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FAutoFocusCtrl := True;
+  OnKeyDown := OnFormKeyDown;
+end;
+
+procedure TBaseForm.OnFormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then
+  begin
+    Key := 0; Close;
+  end;
+
+  if FAutoFocusCtrl then
+    OnCtrlKeyDown(Sender, Key, Shift);
+  //方向键
+end;
+
+//Desc: 处理方向键
+procedure TBaseForm.OnCtrlKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if ssCtrl in Shift then
+  begin
+    case Key of
+     VK_DOWN:
+      begin
+        Key := 0; SwitchFocusCtrl(Self, True);
+      end;
+     VK_UP:
+      begin
+        Key := 0; SwitchFocusCtrl(Self, False);
+      end;
+    end;
+  end;
+end;
+
+//Desc: 特殊键
+procedure TBaseForm.OnCtrlKeyPress(Sender: TObject; var Key: Char);
+begin
+  if (Key = Char(VK_RETURN)) and (Sender is TcxButtonEdit) then
+  begin
+    Key := #0;
+    if Assigned(TcxButtonEdit(Sender).Properties.OnButtonClick) then
+    begin
+      TcxButtonEdit(Sender).Properties.OnButtonClick(Sender, 0);
+      TcxButtonEdit(Sender).SelectAll;
+    end; Exit;
+  end;
+end;
+
+//------------------------------------------------------------------------------
 //Date: 2009-6-13
 //Parm: 权限;参数
 //Desc: 创建Form实例
@@ -100,6 +173,13 @@ class function TBaseForm.CreateForm(const nPopedom: string = '';
  const nParam: Pointer = nil): TWinControl;
 begin
   Result := nil;
+end;
+
+//Desc: 施放实例
+destructor TBaseForm.Destroy;
+begin
+  gControlManager.FreeCtrl(FormID, False);
+  inherited;
 end;
 
 //Desc: 设置权限项

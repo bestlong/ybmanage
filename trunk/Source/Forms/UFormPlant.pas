@@ -328,7 +328,7 @@ end;
 procedure TfFormPlant.EditIDPropertiesButtonClick(Sender: TObject;
   AButtonIndex: Integer);
 begin
-  EditID.Text := RandomItemID(FPrefixID, FIDLength);
+  EditID.Text := FDM.GetRandomID(FPrefixID, FIDLength);
 end;
 
 //------------------------------------------------------------------------------

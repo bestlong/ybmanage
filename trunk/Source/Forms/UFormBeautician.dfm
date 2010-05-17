@@ -2,22 +2,23 @@ inherited fFormBeautician: TfFormBeautician
   Left = 296
   Top = 137
   ClientHeight = 421
-  ClientWidth = 474
+  ClientWidth = 456
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 474
+    Width = 456
     Height = 421
+    AutoContentSizes = [acsWidth]
     AutoControlAlignment = False
     inherited BtnOK: TButton
-      Left = 324
+      Left = 310
       Top = 385
       TabOrder = 14
     end
     inherited BtnExit: TButton
-      Left = 394
+      Left = 380
       Top = 385
       TabOrder = 15
     end
@@ -30,7 +31,7 @@ inherited fFormBeautician: TfFormBeautician
       Properties.IncrementalSearch = False
       Properties.MaxLength = 20
       TabOrder = 5
-      Width = 110
+      Width = 252
     end
     object EditName: TcxTextEdit [3]
       Left = 57
@@ -39,7 +40,7 @@ inherited fFormBeautician: TfFormBeautician
       ParentFont = False
       Properties.MaxLength = 32
       TabOrder = 1
-      Width = 121
+      Width = 252
     end
     object EditMemo: TcxMemo [4]
       Left = 57
@@ -71,7 +72,7 @@ inherited fFormBeautician: TfFormBeautician
       Width = 94
     end
     object BtnAdd: TButton [7]
-      Left = 342
+      Left = 328
       Top = 263
       Width = 50
       Height = 20
@@ -80,7 +81,7 @@ inherited fFormBeautician: TfFormBeautician
       OnClick = BtnAddClick
     end
     object BtnDel: TButton [8]
-      Left = 397
+      Left = 383
       Top = 263
       Width = 50
       Height = 20
@@ -123,7 +124,7 @@ inherited fFormBeautician: TfFormBeautician
       Properties.MaxLength = 15
       Properties.OnButtonClick = EditIDPropertiesButtonClick
       TabOrder = 0
-      Width = 268
+      Width = 252
     end
     object EditSex: TcxComboBox [11]
       Left = 57
@@ -137,7 +138,7 @@ inherited fFormBeautician: TfFormBeautician
         'A=A'#12289#30007
         'B=B'#12289#22899)
       TabOrder = 2
-      Width = 121
+      Width = 252
     end
     object EditAge: TcxTextEdit [12]
       Left = 57
@@ -156,7 +157,7 @@ inherited fFormBeautician: TfFormBeautician
       Width = 121
     end
     object ImagePic: TcxImage [14]
-      Left = 330
+      Left = 316
       Top = 36
       Style.Edges = [bLeft, bTop, bRight, bBottom]
       TabOrder = 7
@@ -171,7 +172,7 @@ inherited fFormBeautician: TfFormBeautician
       ParentFont = False
       Properties.MaxLength = 20
       TabOrder = 6
-      Width = 268
+      Width = 252
     end
     inherited dxLayout1Group_Root: TdxLayoutGroup
       inherited dxGroup1: TdxLayoutGroup

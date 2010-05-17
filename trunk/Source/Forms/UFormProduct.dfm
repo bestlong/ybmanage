@@ -2,21 +2,22 @@ inherited fFormProduct: TfFormProduct
   Left = 296
   Top = 137
   ClientHeight = 446
-  ClientWidth = 483
+  ClientWidth = 482
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 483
+    Width = 482
     Height = 446
+    AutoContentSizes = [acsWidth]
     inherited BtnOK: TButton
-      Left = 334
+      Left = 336
       Top = 410
       TabOrder = 13
     end
     inherited BtnExit: TButton
-      Left = 404
+      Left = 406
       Top = 410
       TabOrder = 14
     end
@@ -69,7 +70,7 @@ inherited fFormProduct: TfFormProduct
       Width = 10
     end
     object BtnAdd: TButton [6]
-      Left = 352
+      Left = 354
       Top = 238
       Width = 50
       Height = 20
@@ -78,7 +79,7 @@ inherited fFormProduct: TfFormProduct
       OnClick = BtnAddClick
     end
     object BtnDel: TButton [7]
-      Left = 407
+      Left = 409
       Top = 238
       Width = 50
       Height = 20
@@ -140,7 +141,7 @@ inherited fFormProduct: TfFormProduct
       Width = 160
     end
     object ImagePic: TcxImage [11]
-      Left = 362
+      Left = 364
       Top = 36
       Properties.Stretch = True
       Style.Edges = [bLeft, bTop, bRight, bBottom]
@@ -175,6 +176,7 @@ inherited fFormProduct: TfFormProduct
     object EditInfo: TcxMemo [14]
       Left = 81
       Top = 263
+      ParentFont = False
       Properties.MaxLength = 500
       Properties.ScrollBars = ssVertical
       TabOrder = 11

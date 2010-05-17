@@ -8,12 +8,12 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  cxTextEdit, cxMaskEdit, cxButtonEdit, UFrameBase, 
-  cxEdit, DB, cxDBData, ADODB,
-  cxContainer, cxLabel, dxLayoutControl, cxGridLevel, cxClasses,
-  cxControls, cxGridCustomView, cxGridCustomTableView, cxGridTableView,
-  cxGridDBTableView, cxGrid, ComCtrls, ToolWin, 
-  cxGraphics, cxDataStorage, cxStyles, cxCustomData, cxFilter, cxData;
+  USysFun, IniFiles, cxButtonEdit, cxStyles, cxCustomData, cxGraphics,
+  cxFilter, cxData, cxDataStorage, cxEdit, DB, cxDBData, ADODB,
+  cxContainer, cxLabel, UBitmapPanel, cxSplitter, dxLayoutControl,
+  cxGridLevel, cxClasses, cxControls, cxGridCustomView,
+  cxGridCustomTableView, cxGridTableView, cxGridDBTableView, cxGrid,
+  ComCtrls, ToolWin, UFrameBase;
 
 type
   TfFrameNormal = class(TBaseFrame)
@@ -38,6 +38,8 @@ type
     GroupDetail1: TdxLayoutGroup;
     SQLQuery: TADOQuery;
     DataSource1: TDataSource;
+    cxSplitter1: TcxSplitter;
+    TitlePanel1: TZnBitmapPanel;
     TitleBar: TcxLabel;
     procedure BtnRefreshClick(Sender: TObject);
     procedure BtnExportClick(Sender: TObject);
@@ -46,17 +48,29 @@ type
     procedure cxView1FocusedRecordChanged(Sender: TcxCustomGridTableView;
       APrevFocusedRecord, AFocusedRecord: TcxCustomGridRecord;
       ANewItemRecordFocusingChanged: Boolean);
+    procedure ToolBar1AdvancedCustomDraw(Sender: TToolBar;
+      const ARect: TRect; Stage: TCustomDrawStage;
+      var DefaultDraw: Boolean);
+    procedure BtnExitClick(Sender: TObject);
   private
     { Private declarations }
   protected
+    FBarImage: TBitmap;
+    {*工具条*}
     FWhere: string;
     {*过滤条件*}
     FShowDetailInfo: Boolean;
     {*显示简明信息*}
+    procedure SetZOrder(TopMost: Boolean); override;
     procedure OnCreateFrame; override;
     procedure OnDestroyFrame; override;
     procedure OnLoadPopedom; override;
     {*基类函数*}
+    procedure OnLoadGridConfig(const nIni: TIniFile); virtual;
+    procedure OnSaveGridConfig(const nIni: TIniFile); virtual;
+    {*表格配置*}
+    procedure OnInitFormData(var nDefault: Boolean; const nWhere: string = '';
+     const nQuery: TADOQuery = nil); virtual;
     procedure InitFormData(const nWhere: string = '';
      const nQuery: TADOQuery = nil); virtual;
     function InitFormDataSQL(const nWhere: string): string; virtual;
@@ -73,20 +87,63 @@ type
     {*按键处理*}
   end;
 
+procedure SetFrameChangeEvent(const nCallBack: TControlChangeEvent);
+//设置变动事件
+
 implementation
 
 {$R *.dfm}
 
 uses
-  IniFiles, ULibFun, UAdjustForm, UFormWait, UFormCtrl, UDataModule,
-  USysFun, USysConst, USysGrid, USysDataDict, USysPopedom, USysDB;
+  ULibFun, UAdjustForm, UFormWait, UFormCtrl, UDataModule, USysConst, USysGrid,
+  USysDataDict, USysPopedom, USysDB;
+
+var
+  gFrameChange: TControlChangeEvent = nil;
+  //Frame变动
+
+procedure SetFrameChangeEvent(const nCallBack: TControlChangeEvent);
+begin
+  gFrameChange := nCallBack;
+end;
 
 //------------------------------------------------------------------------------
 procedure TfFrameNormal.OnCreateFrame;
+var nStr: string;
+    nIni: TIniFile;
 begin
   Name := MakeFrameName(FrameID);
   FWhere := '';
   FShowDetailInfo := True;
+
+  nIni := TIniFile.Create(gPath + sFormConfig);
+  try
+    nStr := gPath + sImageDir + 'title.bmp';
+    nStr := ReplaceGlobalPath(nIni.ReadString(Name, 'TitleImage', nStr));
+    if FileExists(nStr) then TitlePanel1.LoadBitmap(nStr);
+
+    nStr := gPath + sImageDir + 'bar.bmp';
+    nStr := ReplaceGlobalPath(nIni.ReadString(Name, 'BarImage', nStr));
+    if FileExists(nStr) then
+    begin
+      FBarImage := TBitmap.Create;
+      FBarImage.LoadFromFile(nStr);
+    end else FBarImage := nil;
+
+    dxLayout1.Height := nIni.ReadInteger(Name, 'InfoPanelH', dxLayout1.Height);
+    if nIni.ReadBool(Name, 'QuickInfo', True) then
+         cxSplitter1.State := ssOpened
+    else cxSplitter1.State := ssClosed;
+
+    nIni.Free;
+  except
+    nIni.Free;
+    FreeAndNil(FBarImage);
+  end;
+
+  if Assigned(gFrameChange) then
+    gFrameChange(TitleBar.Caption, Self, fsNew);
+  //xxxxx
 end;
 
 procedure TfFrameNormal.OnDestroyFrame;
@@ -94,10 +151,29 @@ var nIni: TIniFile;
 begin
   nIni := TIniFile.Create(gPath + sFormConfig);
   try
+    nIni.WriteBool(Name, 'QuickInfo', cxSplitter1.State = ssOpened);
+    if cxSplitter1.State = ssClosed then cxSplitter1.State := ssOpened;
+    
+    nIni.WriteInteger(Name, 'InfoPanelH', dxLayout1.Height);
     SaveUserDefineTableView(Name, cxView1, nIni);
+    OnSaveGridConfig(nIni);
   finally
     nIni.Free;
   end;
+
+  FreeAndNil(FBarImage);
+  if Assigned(gFrameChange) then
+    gFrameChange(TitleBar.Caption, Self, fsFree);
+  //xxxxx
+end;
+
+//Desc: 组件Z轴位置变动
+procedure TfFrameNormal.SetZOrder(TopMost: Boolean);
+begin
+  inherited;
+  if Assigned(gFrameChange) then
+    gFrameChange(TitleBar.Caption, Self, fsActive);
+  //xxxxx
 end;
 
 //Desc: 读取权限
@@ -126,6 +202,8 @@ begin
     //初始化表头
     InitTableView(Name, cxView1, nIni);
     //初始化风格和顺序
+    OnLoadGridConfig(nIni);
+    //子类扩展初始化
     InitFormData;
     //初始化数据
   finally
@@ -136,6 +214,16 @@ begin
 end;
 
 //------------------------------------------------------------------------------
+procedure TfFrameNormal.OnLoadGridConfig(const nIni: TIniFile);
+begin
+
+end;
+
+procedure TfFrameNormal.OnSaveGridConfig(const nIni: TIniFile);
+begin
+
+end;
+
 procedure TfFrameNormal.GetData(Sender: TObject; var nData: string);
 begin
 
@@ -144,6 +232,7 @@ end;
 //Desc: 设置Sender的数据为nData
 function TfFrameNormal.SetData(Sender: TObject; const nData: string): Boolean;
 var nStr: string;
+    nObj: TObject;
     nRIdx,nCIdx: integer;
     nTable,nField: string;
 begin
@@ -153,7 +242,11 @@ begin
      GetTableByHint(Sender as TComponent, nTable, nField)then
   begin
     nRIdx := cxView1.Controller.SelectedRows[0].RecordIndex;
-    nCIdx := cxView1.DataController.GetItemByFieldName(nField).Index;
+    nObj := cxView1.DataController.GetItemByFieldName(nField);
+    
+    if Assigned(nObj) then
+         nCIdx := cxView1.DataController.GetItemByFieldName(nField).Index
+    else Exit;
     
     nStr := cxView1.DataController.GetDisplayText(nRIdx, nCIdx);
     if nStr = '' then nStr := nData;
@@ -169,16 +262,29 @@ begin
   Result := '';
 end;
 
+//Desc: 执行数据查询
+procedure TfFrameNormal.OnInitFormData(var nDefault: Boolean; const nWhere: string;
+  const nQuery: TADOQuery);
+begin
+
+end;
+
 //Desc: 载入界面数据
 procedure TfFrameNormal.InitFormData(const nWhere: string; const nQuery: TADOQuery);
 var nStr: string;
+    nBool: Boolean;
 begin
-  nStr := InitFormDataSQL(nWhere);
-  if nStr = '' then Exit;
-
   BtnRefresh.Enabled := False;
   try
     ShowMsgOnLastPanelOfStatusBar('正在读取数据,请稍候...');
+    nBool := True;
+
+    OnInitFormData(nBool, nWhere, nQuery);
+    if not nBool then Exit;
+    
+    nStr := InitFormDataSQL(nWhere);
+    if nStr = '' then Exit;
+
     if Assigned(nQuery) then
          FDM.QueryData(nQuery, nStr)
     else FDM.QueryData(SQLQuery, nStr);
@@ -189,6 +295,22 @@ begin
 end;
 
 //------------------------------------------------------------------------------
+//Desc: 绘制工具条背景
+procedure TfFrameNormal.ToolBar1AdvancedCustomDraw(Sender: TToolBar;
+  const ARect: TRect; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
+var nRect: TRect;
+begin
+  if (not Assigned(FBarImage)) or (FBarImage.Width < 1) then Exit;
+  nRect := Rect(ARect.Left, ARect.Top, 0, ARect.Bottom);
+
+  while nRect.Right < ARect.Right do
+  begin
+    nRect.Right := nRect.Left + FBarImage.Width;
+    ToolBar1.Canvas.StretchDraw(nRect, FBarImage);
+    nRect.Left := nRect.Left + FBarImage.Width;
+  end;
+end;
+
 //Desc: 响应回车
 procedure TfFrameNormal.OnCtrlKeyPress(Sender: TObject; var Key: Char);
 begin
@@ -222,10 +344,17 @@ begin
 end;
 
 //------------------------------------------------------------------------------
+//Desc: 退出
+procedure TfFrameNormal.BtnExitClick(Sender: TObject);
+begin
+  if not FIsBusy then Close;
+end;
+
 //Desc: 刷新
 procedure TfFrameNormal.BtnRefreshClick(Sender: TObject);
 begin
-  InitFormData('');
+  FWhere := '';
+  InitFormData(FWhere);
 end;
 
 //Desc: 导出

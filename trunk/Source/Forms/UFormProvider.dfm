@@ -1,27 +1,29 @@
 inherited fFormProvider: TfFormProvider
   Left = 359
   Top = 141
-  ClientHeight = 379
-  ClientWidth = 439
+  ClientHeight = 401
+  ClientWidth = 428
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 439
-    Height = 379
+    Width = 428
+    Height = 401
+    AutoContentSizes = [acsWidth]
+    AutoControlAlignment = False
     inherited BtnOK: TButton
-      Left = 291
-      Top = 345
+      Left = 282
+      Top = 365
       TabOrder = 11
     end
     inherited BtnExit: TButton
-      Left = 361
-      Top = 345
+      Left = 352
+      Top = 365
       TabOrder = 12
     end
     object EditMemo: TcxMemo [2]
-      Left = 69
+      Left = 57
       Top = 136
       Hint = 'T.P_Memo'
       ParentFont = False
@@ -53,7 +55,7 @@ inherited fFormProvider: TfFormProvider
       Width = 90
     end
     object BtnAdd: TButton [5]
-      Left = 309
+      Left = 300
       Top = 223
       Width = 50
       Height = 20
@@ -62,7 +64,7 @@ inherited fFormProvider: TfFormProvider
       OnClick = BtnAddClick
     end
     object BtnDel: TButton [6]
-      Left = 364
+      Left = 355
       Top = 223
       Width = 50
       Height = 20
@@ -73,8 +75,8 @@ inherited fFormProvider: TfFormProvider
     object ListInfo1: TcxMCListBox [7]
       Left = 23
       Top = 248
-      Width = 336
-      Height = 85
+      Width = 391
+      Height = 105
       HeaderSections = <
         item
           Text = #20449#24687#39033
@@ -83,7 +85,7 @@ inherited fFormProvider: TfFormProvider
         item
           AutoSize = True
           Text = #20449#24687#20869#23481
-          Width = 258
+          Width = 313
         end>
       ParentFont = False
       Style.Edges = [bLeft, bTop, bRight, bBottom]
@@ -92,7 +94,7 @@ inherited fFormProvider: TfFormProvider
       OnKeyDown = OnCtrlKeyDown
     end
     object EditAddr: TcxTextEdit [8]
-      Left = 69
+      Left = 57
       Top = 86
       Hint = 'T.P_Addr'
       ParentFont = False
@@ -101,7 +103,7 @@ inherited fFormProvider: TfFormProvider
       Width = 260
     end
     object ImagePic: TcxImage [9]
-      Left = 334
+      Left = 325
       Top = 36
       Style.Edges = [bLeft, bTop, bRight, bBottom]
       TabOrder = 4
@@ -111,7 +113,7 @@ inherited fFormProvider: TfFormProvider
       Width = 80
     end
     object cxTextEdit2: TcxTextEdit [10]
-      Left = 69
+      Left = 57
       Top = 111
       Hint = 'T.P_Phone'
       ParentFont = False
@@ -121,7 +123,7 @@ inherited fFormProvider: TfFormProvider
       Width = 260
     end
     object EditID: TcxButtonEdit [11]
-      Left = 69
+      Left = 57
       Top = 36
       Hint = 'T.P_ID'
       HelpType = htKeyword
@@ -139,9 +141,10 @@ inherited fFormProvider: TfFormProvider
       Width = 260
     end
     object EditName: TcxTextEdit [12]
-      Left = 69
+      Left = 57
       Top = 61
       Hint = 'T.P_Name'
+      ParentFont = False
       Properties.MaxLength = 32
       TabOrder = 1
       OnKeyDown = OnCtrlKeyDown

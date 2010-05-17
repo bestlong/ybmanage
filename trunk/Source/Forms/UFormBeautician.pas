@@ -356,7 +356,7 @@ end;
 procedure TfFormBeautician.EditIDPropertiesButtonClick(Sender: TObject;
   AButtonIndex: Integer);
 begin
-  EditID.Text := RandomItemID(FPrefixID, FIDLength);
+  EditID.Text := FDM.GetRandomID(FPrefixID, FIDLength);
 end;
 
 //Desc: 验证数据

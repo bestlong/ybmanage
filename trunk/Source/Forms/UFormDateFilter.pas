@@ -32,7 +32,7 @@ type
     { Public declarations }
   end;
 
-function ShowDateFilterForm(var nStart,nEnd: TDate): Boolean;
+function ShowDateFilterForm(var nStart,nEnd: TDate; nTime: Boolean = False): Boolean;
 procedure InitDateRange(const nID: string; var nS,nE: TDate);
 procedure SaveDateRange(const nID: string; const nS,nE: TDate);
 //入口函数
@@ -47,13 +47,23 @@ uses
 //Date: 2009-6-5
 //Parm: 开始日期;结束日期
 //Desc: 显示时间段筛选窗口
-function ShowDateFilterForm(var nStart,nEnd: TDate): Boolean;
+function ShowDateFilterForm(var nStart,nEnd: TDate; nTime: Boolean): Boolean;
 begin
   with TfFormDateFilter.Create(Application) do
   begin
     Caption := '日期筛选';
     EditStart.Date := nStart;
     EditEnd.Date := nEnd;
+
+    if nTime then
+    begin
+      EditStart.Properties.Kind := ckDateTime;
+      EditEnd.Properties.Kind := ckDateTime;
+    end else
+    begin
+      EditStart.Properties.Kind := ckDate;
+      EditEnd.Properties.Kind := ckDate;
+    end;
 
     Result := ShowModal = mrOK;
     if Result then
