@@ -9,13 +9,13 @@ unit USysModule;
 interface
 
 uses
-  UFrameLog, UFrameSysLog, UFormBackup, UFormRestore,
+  UFrameLog, UFrameSysLog, UFormBackupSQL, UFormRestoreSQL,
   UFormIncInfo, UFormPassword, UFormMemberType, UFormBeautiType, UFramMember,
   UFormMember, UFrameRemind, UFramBeautician, UFormBaseInfo, UFramPlant,
   UFormPlant, UFramProduct, UFormProduct, UFramSkinType, UFormSkinType,
   UFramPlan, UFormPlan, UFormBeautician, UFormRemind, UFramProvider,
   UFormProvider, UFormMemberOwner, UFormCameraSetup, UFormJiFenRule,
-  UFrameJiFen, UFormJiFen;
+  UFrameJiFen, UFormJiFen, UFramTuPu, UFormTuPu, UFormTuPuView;
 
 implementation
 

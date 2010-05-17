@@ -37,6 +37,7 @@ const
   cFI_FrameSkinType     = $0017;                     //皮肤状况
   cFI_FrameProvider     = $0018;                     //供应商
   cFI_FrameJiFen        = $0019;                     //积分查询
+  cFI_FrameTuPu         = $0020;                     //皮肤图谱
 
   cFI_FormBackup        = $1001;                     //数据备份
   cFI_FormRestore       = $1002;                     //数据恢复
@@ -62,6 +63,9 @@ const
   cFI_FormProvider      = $1026;                     //供应商
   cFI_FormJiFenRule     = $1027;                     //积分规则
   cFI_FormJiFen         = $1028;                     //积分管理
+  
+  cFI_FormTuPu          = $1029;                     //皮肤图谱
+  cFI_FormTuPuView      = $1030;                     //图谱查看
 
   {*Command*}
   cCmd_RefreshData      = $0002;                     //刷新数据
@@ -132,6 +136,7 @@ ResourceString
   sDunHao             = '、';                        //顿号                          
   sBackupDir          = 'Backup\';                   //备份目录
   sBackupFile         = 'Bacup.idx';                 //备份索引
+  sImageDir           = 'Images\';                   //图片目录
 
   sConfigFile         = 'Config.Ini';                //主配置文件
   sConfigSec          = 'Config';                    //主配置小节
@@ -244,6 +249,9 @@ begin
 
   AddMenuModuleItem('MAIN_B08', cFI_FrameJiFen);
   //积分查询
+
+  AddMenuModuleItem('MAIN_E07', cFI_FrameTuPu);
+  //皮肤图谱
 end;
 
 //Desc: 清理模块列表
