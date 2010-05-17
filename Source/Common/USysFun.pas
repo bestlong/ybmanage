@@ -7,7 +7,17 @@ unit USysFun;
 interface
 
 uses
-  Windows, Classes, ComCtrls, Forms, SysUtils, ULibFun, USysConst, IniFiles;
+  Windows, Classes, ComCtrls, Controls, Messages, Forms, SysUtils, IniFiles,
+  ULibFun, USysConst, Registry, WinSpool;
+
+const
+  WM_FrameChange = WM_User + $0027;
+  
+type
+  TControlChangeState = (fsNew, fsFree, fsActive);
+  TControlChangeEvent = procedure (const nName: string; const nCtrl: TWinControl;
+    const nState: TControlChangeState) of object;
+  //控件变动
 
 procedure ShowMsgOnLastPanelOfStatusBar(const nMsg: string);
 procedure StatusBarMsg(const nMsg: string; const nIdx: integer);
@@ -19,8 +29,9 @@ procedure LoadSysParameter(const nIni: TIniFile = nil);
 //载入系统配置参数
 function MakeFrameName(const nFrameID: integer): string;
 //创建Frame名称
-function RandomItemID(const nPrefix: string; nIDLen: Integer): string;
-//随机编号
+
+function ReplaceGlobalPath(const nStr: string): string;
+//替换nStr中的全局路径
 
 procedure LoadListViewColumn(const nWidths: string; const nLv: TListView);
 //载入列表表头宽度
@@ -29,6 +40,9 @@ function MakeListViewColumnInfo(const nLv: TListView): string;
 procedure CombinListViewData(const nList: TStrings; nLv: TListView;
  const nAll: Boolean);
 //组合选中的项的数据
+
+function GetComPortNames(const nList: TStrings): Boolean;
+//Rs232端口
 
 implementation
 
@@ -76,22 +90,14 @@ begin
   Result := 'Frame' + IntToStr(nFrameID);
 end;
 
-//Desc: 生成前缀为nPrefix,长度为nIDLen的随机编号
-function RandomItemID(const nPrefix: string; nIDLen: Integer): string;
-var nStr,nChar: string;
-    nIdx,nMid: integer;
+//Desc: 替换nStr中的全局路径
+function ReplaceGlobalPath(const nStr: string): string;
+var nPath: string;
 begin
-  nStr := FloatToStr(Now);
-  nMid := Round(Length(nStr) / 2);
-
-  for nIdx:=1 to nMid do
-  begin
-    nChar := nStr[nIdx];
-    nStr[nIdx] := nStr[2 * nMid - nIdx];
-    nStr[2 * nMid - nIdx] := nChar[1];
-  end;
-
-  Result := nPrefix + Copy(nStr, 1, nIDLen - Length(nPrefix));
+  nPath := gPath;
+  if Copy(nPath, Length(nPath), 1) = '\' then
+    System.Delete(nPath, Length(nPath), 1);
+  Result := StringReplace(nStr, '$Path', nPath, [rfReplaceAll, rfIgnoreCase]);
 end;
 
 //------------------------------------------------------------------------------
@@ -173,6 +179,83 @@ begin
     nList.Add(nLv.Items[i].Caption + sLogField +
       CombinStr(nLv.Items[i].SubItems, sLogField));
     //combine items's data
+  end;
+end;
+
+//------------------------------------------------------------------------------
+//Date: 2009-12-06
+//Parm: 结果列表
+//Desc: 通过查注册表获取USB串口
+function EnumUSBPort(const nList: TStrings): Boolean;
+var nStr: string;
+    nReg: TRegistry;
+    nTmp: TStrings;
+    i,nCount: integer;
+begin
+  Result := False;
+  nTmp := nil;
+  nReg := TRegistry.Create;
+  try
+    nReg.RootKey := HKEY_LOCAL_MACHINE;
+    if nReg.OpenKeyReadOnly('HARDWARE\DEVICEMAP\SERIALCOMM\') then
+    begin
+      nTmp := TStringList.Create;
+      nReg.GetValueNames(nTmp);
+      nCount := nTmp.Count - 1;
+
+      for i:=0 to nCount do
+      begin
+        nStr := nReg.ReadString(nTmp[i]);
+        if Pos('COM', nStr) = 1 then
+        begin
+          nStr := 'COM' + IntToStr(SplitIntValue(nStr));
+          if nList.IndexOf(nStr) < 0 then nList.Add(nStr);
+        end;
+      end;
+
+      nReg.CloseKey;
+      Result := True;
+    end;
+  finally
+    nTmp.Free;
+    nReg.Free;
+  end;
+end;
+
+//Date: 2009-7-9
+//Parm: 列表
+//Desc: 获取并口列表
+function GetComPortNames(const nList: TStrings): Boolean;
+var nStr: string;
+    nBuffer: Pointer;
+    nInfoPtr: PPortInfo1;
+    nIdx,nBytesNeeded,nReturned: DWORD;
+begin
+  nList.Clear;
+  Result := EnumPorts(nil, 1, nil, 0, nBytesNeeded, nReturned);
+
+  if (not Result) and (GetLastError = ERROR_INSUFFICIENT_BUFFER) then
+  begin
+    GetMem(nBuffer, nBytesNeeded);
+    try
+      Result := EnumPorts(nil, 1, nBuffer, nBytesNeeded, nBytesNeeded, nReturned);
+      for nIdx := 0 to nReturned - 1 do
+      begin
+        nInfoPtr := PPortInfo1(DWORD(nBuffer) + nIdx * SizeOf(TPortInfo1));
+        nStr := nInfoPtr^.pName;
+
+        if Pos('COM', nStr) = 1 then
+        begin
+          nStr := 'COM' + IntToStr(SplitIntValue(nStr));
+          if nList.IndexOf(nStr) < 0 then nList.Add(nStr);
+        end;
+      end;
+
+      EnumUSBPort(nList);
+      //补充USB转串口
+    finally
+      FreeMem(nBuffer);
+    end;
   end;
 end;
 

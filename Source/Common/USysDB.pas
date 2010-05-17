@@ -14,22 +14,25 @@ interface
 uses
   SysUtils, Classes;
 
+const
+  cSysDatabaseName: array[0..4] of String = (
+     'Access', 'SQL', 'MySQL', 'Oracle', 'DB2');
+  //db names
+
 type
   TSysDatabaseType = (dtAccess, dtSQLServer, dtMySQL, dtOracle, dtDB2);
-  //系统数据库类型
+  //db types
 
   PSysTableItem = ^TSysTableItem;
   TSysTableItem = record
-    FTable     : string;
-    FNewSQL    : string;
+    FTable: string;
+    FNewSQL: string;
   end;
   //系统表项
 
 var
-  gSysTableList: TList = nil;
-  //系统表数组
-  gSysDBType: TSysDatabaseType = dtSQLServer;
-  //系统数据类型
+  gSysTableList: TList = nil;                        //系统表数组
+  gSysDBType: TSysDatabaseType = dtSQLServer;        //系统数据类型
 
 //------------------------------------------------------------------------------
 const
@@ -45,6 +48,9 @@ const
   sField_Access_Image            = 'OLEObject';
   sField_SQLServer_Image         = 'Image';
 
+  //日期相关
+  sField_SQLServer_Now           = 'getDate()';
+  
 ResourceString
   {*权限项*}
   sPopedom_Read       = 'A';                         //浏览
@@ -119,6 +125,7 @@ ResourceString
 
   sTable_JiFenRule    = 'Sys_JiFenRule';             //积分规则
   sTable_JiFen        = 'Sys_JiFen';                 //积分表
+  sTable_TuPu         = 'Sys_TuPu';                  //皮肤图谱
 
   {*新建表*}
   sSQL_NewSysDict = 'Create Table $Table(D_ID $Inc, D_Name varChar(15),' +
@@ -418,7 +425,8 @@ ResourceString
   -----------------------------------------------------------------------------}
 
   sSQL_NewPickImage = 'Create Table $Table(P_ID $Inc, P_MID varChar(15),' +
-       'P_Part Integer, P_Date DateTime, P_Desc varChar(50), P_Image $Image)';
+       'P_Part Integer, P_Date DateTime, P_Desc varChar(50), P_Image $Image,' +
+       'P_Small $Image)';
   {-----------------------------------------------------------------------------
    图像采集表: PicImage
    *.P_ID: 编号
@@ -427,6 +435,7 @@ ResourceString
    *.P_Date: 采集时间
    *.P_Desc: 描述信息
    *.P_Image: 图像
+   *.P_Small: 缩略图
   -----------------------------------------------------------------------------}
 
   sSQL_NewJiFenRule = 'Create Table $Table(R_ID $Inc, R_Money $Float,' +
@@ -450,6 +459,23 @@ ResourceString
    *.F_Rule: 积分标准
    *.F_JiFen: 积分
    *.F_Date: 消费日期
+  -----------------------------------------------------------------------------}
+
+  sSQL_NewTuPu = 'Create Table $Table(T_ID $Inc, T_LevelA varChar(50),' +
+       'T_PYA varChar(50), T_LevelB varChar(50), T_PYB varChar(50),' +
+       'T_TuPu $Image, T_Small $Image, T_Memo varChar(50),' +
+       'T_Man varChar(32), T_Date DateTime)';
+  {-----------------------------------------------------------------------------
+   图谱表: TuPu
+   *.T_ID: 编号
+   *.T_LevelA: 一级标识
+   *.T_LevelB: 二级标识
+   *.T_PYA,T_PYB: 拼音
+   *.T_TuPu: 图谱
+   *.T_Small: 微缩图谱
+   *.T_Memo: 备注
+   *.T_Man: 操作人
+   *.T_Date: 操作日期
   -----------------------------------------------------------------------------}
 
 //------------------------------------------------------------------------------
@@ -526,6 +552,7 @@ begin
 
   AddSysTableItem(sTable_JiFenRule, sSQL_NewJiFenRule);
   AddSysTableItem(sTable_JiFen, sSQL_NewJiFen);
+  AddSysTableItem(sTable_TuPu, sSQL_NewTuPu);
 end;
 
 //Desc: 清理系统表
