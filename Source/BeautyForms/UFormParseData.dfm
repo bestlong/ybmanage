@@ -108,6 +108,7 @@ inherited fFormParseData: TfFormParseData
       Height = 553
       Align = alClient
       TabOrder = 0
+      TabStop = False
       LookAndFeel = FDM.dxLayoutWeb1
       object ListInfo1: TcxMCListBox
         Left = 23

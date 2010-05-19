@@ -433,7 +433,7 @@ begin
   EditMan.Text := gSysParam.FUserID;
   EditDate.Text := DateTime2Str(Now);
   SetCtrlData(EditSkin, FSkinType);
-  EditID.Text := RandomItemID(FPrefixID, FIDLength);
+  EditID.Text := FDM.GetRandomID(FPrefixID, FIDLength);
 end;
 
 procedure TfFormEditPlan.EditPlanListPropertiesChange(Sender: TObject);

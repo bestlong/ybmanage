@@ -126,7 +126,7 @@ implementation
 
 uses
   IniFiles, ULibFun, UAdjustForm, USysGrid, USysDB, USysConst, USysGobal,
-  UFormInputbox;
+  UFormInputbox, UFormWait;
   
 const
   cIntervalBorder = 15;  //边界
@@ -767,8 +767,8 @@ end;
 //Desc: 保存采集图像
 procedure TfFormPickImage.BtnSaveClick(Sender: TObject);
 var nStr,nSQL: string;
-    i,nCount,nIdx: integer;
     nItem: TImageViewItem;
+    i,nCount,nIdx: integer; 
 begin
   if ScrollBox1.ControlCount < 1 then
   begin
@@ -783,6 +783,7 @@ begin
 
     for i:=0 to nCount do
     begin
+      ShowWaitForm(Self, Format('%d/%d', [i+1,nCount+1]));
       nItem := TImageViewItem(ScrollBox1.Controls[i]);
       nIdx := nItem.Image.Tag;
 
@@ -790,9 +791,8 @@ begin
                             gImageInfo[nIdx].FTime, gImageInfo[nIdx].FDesc]);
       FDM.ExecuteSQL(nSQL);
 
-      nIdx := FDM.GetFieldMax(sTable_PickImage, 'P_ID');
-      nSQL := 'Select * From %s Where P_ID=%d';
-      nSQL := Format(nSQL, [sTable_PickImage, nIdx]);
+      nSQL := 'Select Top 1 * From %s Order By P_ID DESC';
+      nSQL := Format(nSQL, [sTable_PickImage]);
 
       with FDM.QueryTemp(nSQL) do
        if RecordCount > 0 then
@@ -808,10 +808,13 @@ begin
     end; //记录变更
 
     FDM.ADOConn.CommitTrans;
+    CloseWaitForm;
+
     FDM.ShowMsg('图像已成功保存', sHint);
     CloseForm;
   except
     FDM.ADOConn.RollbackTrans;
+    CloseWaitForm;
     FDM.ShowMsg('图像保存失败', sError);
   end;
 end;

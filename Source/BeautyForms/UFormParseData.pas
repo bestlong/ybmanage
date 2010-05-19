@@ -754,9 +754,9 @@ procedure TfFormParseData.PfIDPropertiesButtonClick(Sender: TObject;
   AButtonIndex: Integer);
 begin
   if Sender = PfID then
-    PfID.Text := RandomItemID(FSkinPrefixID, FSkinIDLength);
+    PfID.Text := FDM.GetRandomID(FSkinPrefixID, FSkinIDLength);
   if Sender = CfID then
-    CfID.Text := RandomItemID(FPlanPrefixID, FPlanIDLength);
+    CfID.Text := FDM.GetRandomID(FPlanPrefixID, FPlanIDLength);
 end;
 
 //Date: 2009-7-26

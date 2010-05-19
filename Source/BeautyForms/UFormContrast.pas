@@ -8,9 +8,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  ExtCtrls, UDataModule, UBgFormBase, cxGraphics, Menus, ImgList,
+  Dialogs, ExtCtrls, UDataModule, UBgFormBase, cxGraphics, Menus, ImgList,
   cxDropDownEdit, cxImageComboBox, UImageViewer, StdCtrls, cxTextEdit,
-  cxControls, cxContainer, cxEdit, cxMaskEdit, cxButtonEdit, UTransPanel;
+  cxControls, cxContainer, cxEdit, cxMaskEdit, cxButtonEdit, UTransPanel,
+  Buttons, UBitmapButton, cxLabel;
 
 type
   TfFormContrast = class(TfBgFormBase)
@@ -32,7 +33,7 @@ type
     EditPart: TcxTextEdit;
     EditSize: TcxTextEdit;
     BtnDel: TButton;
-    ZnTransPanel2: TZnTransPanel;
+    BTPanel: TZnTransPanel;
     Label5: TLabel;
     BtnExit: TButton;
     EditStyle: TcxImageComboBox;
@@ -45,7 +46,14 @@ type
     EditDesc: TcxTextEdit;
     Label1: TLabel;
     EditFilter: TcxButtonEdit;
+    wPage: TNotebook;
     ScrollBox1: TScrollBox;
+    ScrollBox2: TScrollBox;
+    BtnTP: TButton;
+    EditTP: TcxButtonEdit;
+    N4: TMenuItem;
+    N5: TMenuItem;
+    N6: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnExitClick(Sender: TObject);
@@ -59,6 +67,13 @@ type
     procedure EditFilterPropertiesButtonClick(Sender: TObject;
       AButtonIndex: Integer);
     procedure EditStylePropertiesEditValueChanged(Sender: TObject);
+    procedure BtnBackClick(Sender: TObject);
+    procedure BtnTPClick(Sender: TObject);
+    procedure wPagePageChanged(Sender: TObject);
+    procedure EditTPPropertiesButtonClick(Sender: TObject;
+      AButtonIndex: Integer);
+    procedure EditTPKeyPress(Sender: TObject; var Key: Char);
+    procedure N6Click(Sender: TObject);
   private
     { Private declarations }
     FWhere: string;
@@ -523,6 +538,27 @@ begin
   end;
 end;
 
+//Desc: 导出图片
+procedure TfFormContrast.N6Click(Sender: TObject);
+var nItem: TImageViewItem;
+begin
+  nItem := TImageViewItem(PMenu1.PopupComponent);
+  if not Assigned(nItem.Image.Picture.Graphic) then Exit;
+
+  with TSaveDialog.Create(Application) do
+  begin
+    Title := '导出图像';
+    Options := Options + [ofOverwritePrompt];
+
+    DefaultExt := '.bmp';
+    Filter := '图片文件(*.bmp)|*.bmp';
+
+    if Execute then
+      nItem.Image.Picture.SaveToFile(FileName);
+    Free;
+  end;
+end;
+
 //Desc: 在nList中间所nID项
 function FindImageItem(const nList: TList; const nID: Integer): PImageItem;
 var i,nCount: integer;
@@ -558,7 +594,9 @@ begin
     EditDesc.Clear;
 
     EditSize.Clear;
-    FActiveViewItem.Title := '';
+    if Assigned(FActiveViewItem) then
+      FActiveViewItem.Title := '';
+    //xxxxx
   end;
 end;
 
@@ -571,7 +609,9 @@ begin
   nItem := TImageViewItem(Sender);
   if not nItem.Selected then Exit;
 
-  FActiveViewItem := nItem;
+  if nItem.Image.Tag < 0 then
+       FActiveViewItem := nil
+  else FActiveViewItem := nItem;
   LoadViewItemInfo(nItem.Image.Tag);
 
   nPCtrl := nItem.Parent;
@@ -606,7 +646,9 @@ begin
   nD.Image.Tag := TImage(Source).Tag;
   nD.Image.Picture.Graphic := TImage(Source).Picture.Graphic;
 
-  FActiveViewItem := nD;
+  if nD.Image.Tag < 0 then
+       FActiveViewItem := nil
+  else FActiveViewItem := nD;
   LoadViewItemInfo(nD.Image.Tag);
 end;
 
@@ -676,6 +718,140 @@ begin
   begin
     LoadImageList(FWhere, nHint);
     LoadImageItem;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+//Desc: 显示图谱
+procedure TfFormContrast.BtnTPClick(Sender: TObject);
+begin
+  if wPage.PageIndex = 0 then
+  begin
+    wPage.PageIndex := 1;  
+    EditTP.SetFocus;
+  end else
+  begin
+    wPage.PageIndex := 0;
+    EditFilter.SetFocus;
+  end;
+end;
+
+procedure TfFormContrast.wPagePageChanged(Sender: TObject);
+begin
+  if wPage.PageIndex = 0 then
+  begin
+    BtnTP.Caption := '显示图谱';
+    EditFilter.BringToFront;
+    Label1.Caption := '筛选图像:';
+  end else
+  begin
+    BtnTP.Caption := '显示图像';
+    EditTP.BringToFront;
+    Label1.Caption := '筛选图谱:';
+  end;
+
+  BTPanel.InvalidRect := Rect(0, 0, EditFilter.Left - 1, BTPanel.Height);
+  BTPanel.InvalidPanel;
+end;
+
+//Desc: 返回图像列表
+procedure TfFormContrast.BtnBackClick(Sender: TObject);
+begin
+  wPage.PageIndex := 0;
+end;
+
+//Desc: 载入图谱
+procedure TfFormContrast.EditTPPropertiesButtonClick(Sender: TObject;
+  AButtonIndex: Integer);
+var nIdx: integer;
+    nStr,nA,nB: string;
+    nView: TImageViewItem;
+begin
+  EditTP.Text := Trim(EditTP.Text);
+  if EditTP.Text = '' then
+  begin
+    FDM.ShowMsg('请输入图谱检索内容', sHint); Exit;
+  end;
+
+  nIdx := Pos(' ', EditTP.Text);
+  if nIdx > 0 then
+  begin
+    nB := EditTP.Text;
+    nA := Copy(nB, 1, nIdx - 1);
+    System.Delete(nB, 1, nIdx);
+
+    nStr := '(T_LevelA like ''%%%s%%'' or T_PYA like ''%%%s%%'') and ' +
+              '(T_LevelB like ''%%%s%%'' or T_PYB like ''%%%s%%'')';
+    nStr := Format(nStr, [nA, nA, nB, nB]);
+  end else
+  begin
+    nStr := 'T_LevelA like ''%%%s%%'' or T_PYA like ''%%%s%%''';
+    nStr := Format(nStr, [EditTP.Text, EditTP.Text]);
+  end;
+
+  nA := 'Select T_LevelA,T_TuPu From %s Where (%s)';
+  nStr := Format(nA, [sTable_TuPu, nStr]);
+
+  with FDM.QueryTemp(nStr) do
+  if RecordCount < 1 then
+  begin
+    FDM.ShowMsg('没有满足条件的图谱', sHint); Exit;
+  end;
+
+  nIdx := 0;
+  nView := nil;
+  ScrollBox2.DisableAutoRange;
+  try
+    FDM.SqlTemp.First;
+    while not FDM.SqlTemp.Eof do
+    begin
+      if nIdx < ScrollBox2.ControlCount then
+      begin
+        nView := TImageViewItem(ScrollBox2.Controls[nIdx]);
+        nView.Visible := True;
+      end else
+      begin
+        nView := TImageViewItem.Create(ScrollBox2);
+        nView.Parent := ScrollBox2;
+        nView.Align := alTop;
+        nView.Height := Round(ScrollBox2.Width / (4 / 3));
+
+        nView.SetFitSize;
+        nView.OnBeginDrag := OnViewItemBeginDrag;
+        nView.OnSelected := ViewItem1Selected;
+        LoadImageViewItemConfig(Name, nView);
+      end;
+
+      Inc(nIdx);
+      nView.Image.Tag := -1;
+      FDM.LoadDBImage(FDM.SqlTemp, 'T_TuPu', nView.Image.Picture);
+
+      nView.Title := FDM.SqlTemp.FieldByName('T_LevelA').AsString; 
+      FDM.SqlTemp.Next;
+    end;
+
+    while nIdx < ScrollBox2.ControlCount do
+    begin
+      ScrollBox2.Controls[nIdx].Visible := False;
+      Inc(nIdx);
+    end;
+  finally
+    ScrollBox2.EnableAutoRange;
+
+    if nIdx > 0 then
+      ScrollBox2.ScrollInView(nView);
+    //xxxxx
+  end;
+end;
+
+//Desc: 相应回车
+procedure TfFormContrast.EditTPKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    EditTP.SelectAll;
+    EditTPPropertiesButtonClick(nil, 0);
   end;
 end;
 
