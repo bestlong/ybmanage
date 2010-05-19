@@ -4,6 +4,7 @@
 *******************************************************************************}
 unit UUSBReader;
 
+{$I Link.inc}
 interface
 
 uses
@@ -24,6 +25,9 @@ var nStr: string;
     nIdx: integer;
     nUSB: TUSBNodes;
 begin
+  {$IFDEF DEBUG}
+  Result := True; Exit;
+  {$ENDIF} 
   Result := gIsValidCamera;
   if Result then Exit;
 
