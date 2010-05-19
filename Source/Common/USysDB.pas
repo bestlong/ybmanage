@@ -425,8 +425,7 @@ ResourceString
   -----------------------------------------------------------------------------}
 
   sSQL_NewPickImage = 'Create Table $Table(P_ID $Inc, P_MID varChar(15),' +
-       'P_Part Integer, P_Date DateTime, P_Desc varChar(50), P_Image $Image,' +
-       'P_Small $Image)';
+       'P_Part Integer, P_Date DateTime, P_Desc varChar(50), P_Image $Image)';
   {-----------------------------------------------------------------------------
    图像采集表: PicImage
    *.P_ID: 编号
@@ -435,7 +434,6 @@ ResourceString
    *.P_Date: 采集时间
    *.P_Desc: 描述信息
    *.P_Image: 图像
-   *.P_Small: 缩略图
   -----------------------------------------------------------------------------}
 
   sSQL_NewJiFenRule = 'Create Table $Table(R_ID $Inc, R_Money $Float,' +
