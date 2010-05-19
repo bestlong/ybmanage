@@ -19,3 +19,7 @@ Delete From Sys_PlanUsed;
 Delete From Sys_ProductUsed;
 Delete From Sys_PickImage;
 Delete From Sys_PlanReport;
+
+Delete From Sys_JiFenRule;
+Delete From Sys_JiFen;
+Delete From Sys_TuPu;

@@ -1,0 +1,25 @@
+Drop Table Sys_MemberType;
+Drop Table Sys_Member;
+Drop Table Sys_MemberExt;
+Drop Table Sys_BeautiType;
+Drop Table Sys_Remind;
+
+Drop Table Sys_Beautician;
+Drop Table Sys_BeauticianExt;
+Drop Table Sys_ProductType;
+Drop Table Sys_Plant;
+Drop Table Sys_Product;
+Drop Table Sys_SkinType;
+
+Drop Table Sys_Plan;
+Drop Table Sys_PlanExt;
+Drop Table Sys_Provider;
+Drop Table Sys_Hardware;
+Drop Table Sys_PlanUsed;
+Drop Table Sys_ProductUsed;
+Drop Table Sys_PickImage;
+Drop Table Sys_PlanReport;
+
+Drop Table Sys_JiFenRule;
+Drop Table Sys_JiFen;
+Drop Table Sys_TuPu;
