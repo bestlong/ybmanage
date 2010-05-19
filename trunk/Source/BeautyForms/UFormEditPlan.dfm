@@ -16,6 +16,7 @@ inherited fFormEditPlan: TfFormEditPlan
       Height = 444
       Align = alClient
       TabOrder = 0
+      TabStop = False
       LookAndFeel = FDM.dxLayoutWeb1
       object BtnOK: TButton
         Left = 358

@@ -51,6 +51,8 @@ type
      const nHint: Boolean = True;
      const nKeyID: string = ''; const nMan: string = ''): Boolean;
     {*系统日志*}
+    function GetRandomID(const nPrefix: string; const nIDLen: Integer): string;
+    {*自动编号*}
     function GetFieldMax(const nTable,nField: string): integer;
     {*字段最大值*}
     procedure FillStringsData(const nList: TStrings; const nSQL: string;
@@ -243,6 +245,29 @@ begin
     Result := False;
     if nHint then FDM.ShowMsg('写入系统日志时发生错误', sHint);
   end;
+end;
+
+//Desc: 生成前缀为nPrefix,长度为nIDLen的随机编号
+function TFDM.GetRandomID(const nPrefix: string; const nIDLen: Integer): string;
+var nStr,nChar: string;
+    nIdx,nMid: integer;
+begin
+  nStr := FloatToStr(Now);
+  while Length(nStr) < nIDLen do
+    nStr := nStr + FloatToStr(Now);
+  //xxxxx
+
+  nStr := StringReplace(nStr, '.', '0', [rfReplaceAll]);
+  nMid := Trunc(Length(nStr) / 2);
+
+  for nIdx:=1 to nMid do
+  begin
+    nChar := nStr[nIdx];
+    nStr[nIdx] := nStr[2 * nMid - nIdx];
+    nStr[2 * nMid - nIdx] := nChar[1];
+  end;
+
+  Result := nPrefix + Copy(nStr, 1, nIDLen - Length(nPrefix));
 end;
 
 //Date: 2009-6-10
